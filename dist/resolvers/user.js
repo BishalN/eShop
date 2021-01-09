@@ -74,7 +74,17 @@ UserResponse = __decorate([
     type_graphql_1.ObjectType()
 ], UserResponse);
 let UserResolver = class UserResolver {
-    register(options) {
+    me({ req }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userId = req.session.userId;
+            const user = yield User_1.User.findOne(userId);
+            if (!user) {
+                throw new Error('Not Authenticated');
+            }
+            return user;
+        });
+    }
+    register(options, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!validator_1.default.isEmail(options.email)) {
                 return { errors: [{ field: 'email', message: 'Invalid Email' }] };
@@ -107,10 +117,11 @@ let UserResolver = class UserResolver {
                     };
                 }
             }
+            req.session.userId = user.id;
             return { user };
         });
     }
-    login(email, password) {
+    login(email, password, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield User_1.User.findOne({ where: { email } });
             if (!user) {
@@ -126,23 +137,33 @@ let UserResolver = class UserResolver {
                     errors: [{ field: 'Password', message: 'Invalid Password' }],
                 };
             }
+            req.session.userId = user.id;
             return { user };
         });
     }
 };
 __decorate([
+    type_graphql_1.Query(() => User_1.User),
+    __param(0, type_graphql_1.Ctx()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "me", null);
+__decorate([
     type_graphql_1.Mutation(() => UserResponse),
     __param(0, type_graphql_1.Arg('options')),
+    __param(1, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [NameEmailPasswordInuput]),
+    __metadata("design:paramtypes", [NameEmailPasswordInuput, Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
 __decorate([
     type_graphql_1.Mutation(() => UserResponse),
     __param(0, type_graphql_1.Arg('email')),
     __param(1, type_graphql_1.Arg('password')),
+    __param(2, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "login", null);
 UserResolver = __decorate([

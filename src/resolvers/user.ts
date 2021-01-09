@@ -1,16 +1,18 @@
 import { User } from '../entity/User';
 import {
   Resolver,
-  Query,
   Mutation,
   InputType,
   Field,
   Arg,
   ObjectType,
+  Ctx,
+  Query,
 } from 'type-graphql';
 import argon2 from 'argon2';
 import { getConnection } from 'typeorm';
 import validator from 'validator';
+import { MyContext } from '../types';
 
 @InputType()
 class NameEmailPasswordInuput {
@@ -44,9 +46,20 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User)
+  async me(@Ctx() { req }: MyContext) {
+    const userId = req.session.userId;
+    const user = await User.findOne(userId);
+    if (!user) {
+      throw new Error('Not Authenticated');
+    }
+    return user;
+  }
+
   @Mutation(() => UserResponse)
   async register(
-    @Arg('options') options: NameEmailPasswordInuput
+    @Arg('options') options: NameEmailPasswordInuput,
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     if (!validator.isEmail(options.email)) {
       return { errors: [{ field: 'email', message: 'Invalid Email' }] };
@@ -81,13 +94,16 @@ export class UserResolver {
       }
     }
 
+    req.session.userId = user.id;
+
     return { user };
   }
 
   @Mutation(() => UserResponse)
   async login(
     @Arg('email') email: string,
-    @Arg('password') password: string
+    @Arg('password') password: string,
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     const user = await User.findOne({ where: { email } });
     if (!user) {
@@ -105,6 +121,8 @@ export class UserResolver {
         errors: [{ field: 'Password', message: 'Invalid Password' }],
       };
     }
+
+    req.session.userId = user.id;
 
     return { user };
   }
