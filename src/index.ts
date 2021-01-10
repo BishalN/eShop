@@ -5,6 +5,7 @@ import { buildSchema } from 'type-graphql';
 import express from 'express';
 import { HelloResolver } from './resolvers/helloResolver';
 import { UserResolver } from './resolvers/user';
+import { PrductResolver } from './resolvers/product';
 import redis from 'redis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
@@ -39,7 +40,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, UserResolver],
+      resolvers: [HelloResolver, UserResolver, PrductResolver],
       validate: false,
     }),
     context: ({ req, res }): MyContext => ({ req, res }),

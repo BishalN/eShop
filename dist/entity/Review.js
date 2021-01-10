@@ -9,58 +9,51 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
-const typeorm_1 = require("typeorm");
+exports.Review = void 0;
 const type_graphql_1 = require("type-graphql");
+const typeorm_1 = require("typeorm");
+const User_1 = require("./User");
 const Product_1 = require("./Product");
-const Review_1 = require("./Review");
-let User = class User extends typeorm_1.BaseEntity {
+let Review = class Review {
 };
 __decorate([
     type_graphql_1.Field(() => type_graphql_1.Int),
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], User.prototype, "id", void 0);
+], Review.prototype, "id", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => Product_1.Product, (product) => product.creator),
-    __metadata("design:type", Array)
-], User.prototype, "products", void 0);
+    type_graphql_1.Field(() => User_1.User),
+    typeorm_1.ManyToOne(() => User_1.User, (user) => user.reviews),
+    __metadata("design:type", User_1.User)
+], Review.prototype, "reviewer", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => Review_1.Review, (review) => review.reviewer),
-    __metadata("design:type", Array)
-], User.prototype, "reviews", void 0);
+    type_graphql_1.Field(),
+    typeorm_1.ManyToOne(() => Product_1.Product, (product) => product.reviews),
+    __metadata("design:type", Number)
+], Review.prototype, "productId", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    typeorm_1.Column(),
+    __metadata("design:type", Number)
+], Review.prototype, "rating", void 0);
 __decorate([
     type_graphql_1.Field(),
     typeorm_1.Column(),
     __metadata("design:type", String)
-], User.prototype, "name", void 0);
+], Review.prototype, "comment", void 0);
 __decorate([
     type_graphql_1.Field(),
-    typeorm_1.Column({ unique: true }),
-    __metadata("design:type", String)
-], User.prototype, "email", void 0);
-__decorate([
-    typeorm_1.Column(),
-    __metadata("design:type", String)
-], User.prototype, "password", void 0);
-__decorate([
-    type_graphql_1.Field(),
-    typeorm_1.Column({ default: false }),
-    __metadata("design:type", Boolean)
-], User.prototype, "isAdmin", void 0);
-__decorate([
-    type_graphql_1.Field(() => String),
     typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)
-], User.prototype, "createdAt", void 0);
+], Review.prototype, "createdAt", void 0);
 __decorate([
-    type_graphql_1.Field(() => String),
+    type_graphql_1.Field(),
     typeorm_1.UpdateDateColumn(),
     __metadata("design:type", Date)
-], User.prototype, "upadatedAt", void 0);
-User = __decorate([
-    typeorm_1.Entity(),
-    type_graphql_1.ObjectType()
-], User);
-exports.User = User;
-//# sourceMappingURL=User.js.map
+], Review.prototype, "updatedAt", void 0);
+Review = __decorate([
+    type_graphql_1.ObjectType(),
+    typeorm_1.Entity()
+], Review);
+exports.Review = Review;
+//# sourceMappingURL=Review.js.map

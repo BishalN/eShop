@@ -19,6 +19,7 @@ const type_graphql_1 = require("type-graphql");
 const express_1 = __importDefault(require("express"));
 const helloResolver_1 = require("./resolvers/helloResolver");
 const user_1 = require("./resolvers/user");
+const product_1 = require("./resolvers/product");
 const redis_1 = __importDefault(require("redis"));
 const express_session_1 = __importDefault(require("express-session"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
@@ -45,7 +46,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
-            resolvers: [helloResolver_1.HelloResolver, user_1.UserResolver],
+            resolvers: [helloResolver_1.HelloResolver, user_1.UserResolver, product_1.PrductResolver],
             validate: false,
         }),
         context: ({ req, res }) => ({ req, res }),

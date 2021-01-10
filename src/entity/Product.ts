@@ -18,13 +18,13 @@ export class Product {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Field()
+  @Field(() => User)
   @ManyToOne(() => User, (user) => user.products)
-  creator: User;
+  creator!: User;
 
-  @Field()
-  @OneToMany(() => Review, (review) => review.productId)
-  reviews: Review;
+  @Field(() => [Review])
+  @OneToMany(() => Review, (review) => review.productId, { nullable: true })
+  reviews: Review[];
 
   @Field()
   @Column()
@@ -47,12 +47,12 @@ export class Product {
   description!: string;
 
   @Field()
-  @Column()
-  rating!: number;
+  @Column({ default: 0 })
+  rating: number;
 
   @Field()
-  @Column()
-  numReviews!: number;
+  @Column({ default: 0 })
+  numReviews: number;
 
   @Field()
   @Column()

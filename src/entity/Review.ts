@@ -3,9 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -19,7 +17,7 @@ export class Review {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Field()
+  @Field(() => User)
   @ManyToOne(() => User, (user) => user.reviews)
   reviewer: User;
 
