@@ -5,36 +5,47 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BaseEntity,
+  OneToMany,
+  ManyToMany,
+  ManyToOne,
 } from 'typeorm';
 import { Field, Int, ObjectType } from 'type-graphql';
+import { Product } from './Product';
+import { Review } from './Review';
 
 @Entity()
 @ObjectType()
 export class User extends BaseEntity {
   @Field(() => Int!)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
+
+  @OneToMany(() => Product, (product) => product.creator)
+  products: Product[];
+
+  @OneToMany(() => Review, (review) => review.reviewer)
+  reviews: Review[];
 
   @Field()
   @Column()
-  name: string;
+  name!: string;
 
   @Field()
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column()
-  password: string;
+  password!: string;
 
   @Field()
   @Column({ default: false })
-  isAdmin: boolean;
+  isAdmin!: boolean;
 
   @Field(() => String)
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @Field(() => String)
   @UpdateDateColumn()
-  upadatedAt: Date;
+  upadatedAt!: Date;
 }
