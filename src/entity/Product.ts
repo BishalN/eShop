@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   OneToMany,
+  BaseEntity,
 } from 'typeorm';
 import { Field, Int, ObjectType } from 'type-graphql';
 import { User } from './User';
@@ -13,7 +14,7 @@ import { Review } from './Review';
 
 @Entity()
 @ObjectType()
-export class Product {
+export class Product extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id!: number;

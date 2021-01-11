@@ -27,13 +27,24 @@ const ProductInput_1 = require("../utils/ProductInput");
 const type_graphql_1 = require("type-graphql");
 const User_1 = require("../entity/User");
 const typeorm_1 = require("typeorm");
+const isAuth_1 = require("../middleware/isAuth");
 let PrductResolver = class PrductResolver {
+    creator(product) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(product);
+            const creator = yield User_1.User.findOne(product.creatorId);
+            return creator;
+        });
+    }
+    products() {
+        return Product_1.Product.find({});
+    }
+    product(id) {
+        return Product_1.Product.findOne(id);
+    }
     createProduct(options, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield User_1.User.findOne(req.session.userId);
-            if (!user || !user.isAdmin) {
-                throw new Error('Not authorized as an admin');
-            }
             let product;
             try {
                 const result = yield typeorm_1.getConnection()
@@ -48,6 +59,7 @@ let PrductResolver = class PrductResolver {
                     countInStock: options.countInStock,
                     price: options.price,
                     creator: user,
+                    description: options.description,
                 })
                     .returning('*')
                     .execute();
@@ -59,8 +71,50 @@ let PrductResolver = class PrductResolver {
             return product;
         });
     }
+    updateProduct(options, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let updatedProduct;
+            try {
+                const result = yield typeorm_1.getConnection()
+                    .createQueryBuilder()
+                    .update(Product_1.Product)
+                    .set(Object.assign({}, options))
+                    .where('id =:id', {
+                    id,
+                })
+                    .returning('*')
+                    .execute();
+                updatedProduct = result.raw[0];
+            }
+            catch (error) {
+                throw new Error(error.message);
+            }
+            return updatedProduct;
+        });
+    }
 };
 __decorate([
+    type_graphql_1.FieldResolver(() => User_1.User),
+    __param(0, type_graphql_1.Root()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PrductResolver.prototype, "creator", null);
+__decorate([
+    type_graphql_1.Query(() => [Product_1.Product]),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], PrductResolver.prototype, "products", null);
+__decorate([
+    type_graphql_1.Query(() => Product_1.Product),
+    __param(0, type_graphql_1.Arg('id', () => type_graphql_1.ID)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], PrductResolver.prototype, "product", null);
+__decorate([
+    type_graphql_1.UseMiddleware(isAuth_1.isAuthAsAdmin),
     type_graphql_1.Mutation(() => Product_1.Product),
     __param(0, type_graphql_1.Arg('options')),
     __param(1, type_graphql_1.Ctx()),
@@ -68,8 +122,17 @@ __decorate([
     __metadata("design:paramtypes", [ProductInput_1.ProductInput, Object]),
     __metadata("design:returntype", Promise)
 ], PrductResolver.prototype, "createProduct", null);
+__decorate([
+    type_graphql_1.UseMiddleware(isAuth_1.isAuthAsAdmin),
+    type_graphql_1.Mutation(() => Product_1.Product),
+    __param(0, type_graphql_1.Arg('options')),
+    __param(1, type_graphql_1.Arg('id', () => type_graphql_1.Int)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [ProductInput_1.ProductInput, Number]),
+    __metadata("design:returntype", Promise)
+], PrductResolver.prototype, "updateProduct", null);
 PrductResolver = __decorate([
-    type_graphql_1.Resolver()
+    type_graphql_1.Resolver(Product_1.Product)
 ], PrductResolver);
 exports.PrductResolver = PrductResolver;
 //# sourceMappingURL=product.js.map

@@ -46,14 +46,13 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-  @Query(() => User)
-  async me(@Ctx() { req }: MyContext) {
-    const userId = req.session.userId;
-    const user = await User.findOne(userId);
-    if (!user) {
-      throw new Error('Not Authenticated');
+  @Query(() => User, { nullable: true })
+  me(@Ctx() { req }: MyContext) {
+    if (!req.session.userId) {
+      return null;
     }
-    return user;
+
+    return User.findOne(req.session.userId);
   }
 
   @Mutation(() => UserResponse)
@@ -125,5 +124,22 @@ export class UserResolver {
     req.session.userId = user.id;
 
     return { user };
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext) {
+    req.session.userId = undefined;
+    return new Promise((resolve) =>
+      req.session.destroy((err) => {
+        res.clearCookie('qid');
+        if (err) {
+          console.log(err);
+          resolve(false);
+          return;
+        }
+
+        resolve(true);
+      })
+    );
   }
 }
